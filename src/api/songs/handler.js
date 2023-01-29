@@ -10,22 +10,8 @@ class SongsHandler {
 
   async postSongHandler(request, h) {
     this._validator.validateSongPayload(request.payload);
-    const {
-      title = 'untitled',
-      year,
-      genre,
-      performer,
-      duration,
-      albumId = '-',
-    } = request.payload;
-    const songId = await this._service.addSong({
-      title,
-      year,
-      performer,
-      genre,
-      duration,
-      albumId,
-    });
+
+    const songId = await this._service.addSong(request.payload);
 
     const response = h.response({
       status: 'success',
@@ -40,78 +26,12 @@ class SongsHandler {
   async getSongsHandler(request) {
     const { title, performer } = request.query;
 
-    const Allsong = await this._service.getSongs();
-
-    if (title && performer) {
-      const filteredSongs = Allsong.filter((song) => {
-        const titleSong = song.title.toLowerCase();
-        const performerSong = song.performer.toLowerCase();
-        const titleSearch = title.toLowerCase();
-        const performerSearch = performer.toLowerCase();
-
-        return titleSong.includes(titleSearch) && performerSong.includes(performerSearch);
-      });
-
-      return {
-        status: 'success',
-        data: {
-          songs: filteredSongs.map((song) => ({
-            id: song.id,
-            title: song.title,
-            performer: song.performer,
-          })),
-        },
-      };
-    }
-
-    if (title) {
-      const filteredSongs = Allsong.filter((song) => {
-        const titleSong = song.title.toLowerCase();
-        const titleSearch = title.toLowerCase();
-
-        return titleSong.includes(titleSearch);
-      });
-
-      return {
-        status: 'success',
-        data: {
-          songs: filteredSongs.map((song) => ({
-            id: song.id,
-            title: song.title,
-            performer: song.performer,
-          })),
-        },
-      };
-    }
-
-    if (performer) {
-      const filteredSongs = Allsong.filter((song) => {
-        const performerSong = song.performer.toLowerCase();
-        const performerSearch = performer.toLowerCase();
-
-        return performerSong.includes(performerSearch);
-      });
-
-      return {
-        status: 'success',
-        data: {
-          songs: filteredSongs.map((song) => ({
-            id: song.id,
-            title: song.title,
-            performer: song.performer,
-          })),
-        },
-      };
-    }
+    const songs = await this._service.getSongs(title, performer);
 
     return {
       status: 'success',
       data: {
-        songs: Allsong.map((song) => ({
-          id: song.id,
-          title: song.title,
-          performer: song.performer,
-        })),
+        songs,
       },
     };
   }
@@ -130,22 +50,8 @@ class SongsHandler {
   async putSongByIdHandler(request) {
     this._validator.validateSongPayload(request.payload);
     const { id } = request.params;
-    const {
-      title,
-      year,
-      genre,
-      performer,
-      duration,
-      albumId = '-',
-    } = request.payload;
-    await this._service.editSongById(id, {
-      title,
-      year,
-      genre,
-      performer,
-      duration,
-      albumId,
-    });
+
+    await this._service.editSongById(id, request.payload);
 
     return {
       status: 'success',
