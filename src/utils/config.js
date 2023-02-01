@@ -11,6 +11,12 @@ const config = {
   rabbitMq: {
     server: process.env.RABBITMQ_SERVER,
   },
+  S3: {
+    bucketName: process.env.AWS_BUCKET_NAME,
+  },
+  redis: {
+    server: process.env.REDIS_SERVER,
+  },
 };
 
 module.exports = config;
